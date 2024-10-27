@@ -170,11 +170,8 @@ param autoScaleConfiguration object = {
 // @description('Optional. Extended Location Resource ID for VNET.')
 // param vNetExtendedLocationResourceId string = ''
 
-// @description('Optional. Specifies the extended location for this resource.')
-// param extendedLocation object = {
-//   name: ''
-//   type: 'EdgeZone'
-// }
+@description('Optional. Specifies the extended location name for this resource.')
+param extendedLocationName string = ''
 
 // @description('Optional. Configurations for VPN client connection settings.')
 // param vngClientConnectionConfigurations array = []
@@ -188,6 +185,13 @@ param autoScaleConfiguration object = {
 var gatewayPipAllocationMethod = skuName == 'Basic' ? 'Dynamic' : 'Static'
 
 var isExpressRoute = gatewayType == 'ExpressRoute'
+
+var extendedLocation = !empty(extendedLocationName) 
+? {
+  name: extendedLocationName
+  type: 'EdgeZone'
+}
+: {}
 
 var vpnTypeVar = !isExpressRoute ? vpnType : 'PolicyBased'
 
@@ -431,7 +435,7 @@ resource virtualNetworkGateway 'Microsoft.Network/virtualNetworkGateways@2024-03
   name: name
   location: location
   tags: tags
-  //extendedLocation: !empty(extendedLocation.name) ? extendedLocation : {}
+  extendedLocation: extendedLocation
   properties: {
     ipConfigurations: ipConfiguration
     activeActive: isActiveActive

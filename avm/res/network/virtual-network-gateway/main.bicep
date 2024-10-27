@@ -435,7 +435,7 @@ resource virtualNetworkGateway 'Microsoft.Network/virtualNetworkGateways@2024-03
   name: name
   location: location
   tags: tags
-  extendedLocation: extendedLocation
+  // extendedLocation: extendedLocation
   properties: {
     ipConfigurations: ipConfiguration
     activeActive: isActiveActive

@@ -131,44 +131,44 @@ param enableTelemetry bool = true
 @description('Optional. Configuration for AAD Authentication for P2S Tunnel Type, Cannot be configured if clientRootCertData is provided.')
 param vpnClientAadConfiguration object = {}
 
-@description('Optional. Specifies administrative state of the Virtual Network Gateway.')
-@allowed([
-  'Enabled'
-  'Disabled'
-])
-param adminState string = 'Enabled'
+// @description('Optional. Specifies administrative state of the Virtual Network Gateway.')
+// @allowed([
+//   'Enabled'
+//   'Disabled'
+// ])
+// param adminState string = 'Enabled'
 
-@description('Optional. The Radius server configuration for VPN clients.')
-param radiusServers radiusServerType []?
+// @description('Optional. The Radius server configuration for VPN clients.')
+// param radiusServers radiusServerType []?
 
-@description('Optional. The radius secret property of the VirtualNetworkGateway resource for vpn client connection.')
-@secure()
-param radiusServerSecret string?
+// @description('Optional. The radius secret property of the VirtualNetworkGateway resource for vpn client connection.')
+// @secure()
+// param radiusServerSecret string?
 
-@description('Optional. VPN client IPsec policies for virtual network gateway P2S client.')
-param vpnClientIpsecPolicies ipsecPolicyType []?
+// @description('Optional. VPN client IPsec policies for virtual network gateway P2S client.')
+// param vpnClientIpsecPolicies ipsecPolicyType []?
 
-@description('Optional. Configuration for VPN Client Root Certificates.')
-param vpnClientRootCertificates array = []
+// @description('Optional. Configuration for VPN Client Root Certificates.')
+// param vpnClientRootCertificates array = []
 
-@description('Optional. The custom routes for the Virtual Network Gateway.')
-param customRoutes object = {
-  addressPrefixes: []
-}
+// @description('Optional. The custom routes for the Virtual Network Gateway.')
+// param customRoutes object = {
+//   addressPrefixes: []
+// }
 
-@description('Optional. The configuration for Auto-Scaling. Minimum and Maximum bounds.')
-param autoScaleConfiguration object = {
-  bounds: {
-    min: 1
-    max: 10
-  }
-}
+// @description('Optional. The configuration for Auto-Scaling. Minimum and Maximum bounds.')
+// param autoScaleConfiguration object = {
+//   bounds: {
+//     min: 1
+//     max: 10
+//   }
+// }
 
-@description('Optional. Virtual Network Gateway Policy Groups.')
-param virtualNetworkGatewayPolicyGroups virtualNetworkGatewayPolicyGroupType []?
+// @description('Optional. Virtual Network Gateway Policy Groups.')
+// param virtualNetworkGatewayPolicyGroups virtualNetworkGatewayPolicyGroupType []?
 
-@description('Optional. Extended Location Resource ID for VNET.')
-param vNetExtendedLocationResourceId string = ''
+// @description('Optional. Extended Location Resource ID for VNET.')
+// param vNetExtendedLocationResourceId string = ''
 
 @description('Optional. Specifies the extended location for this resource.')
 param extendedLocation object = {
@@ -176,8 +176,8 @@ param extendedLocation object = {
   type: 'EdgeZone'
 }
 
-@description('Optional. Configurations for VPN client connection settings.')
-param vngClientConnectionConfigurations array = []
+// @description('Optional. Configurations for VPN client connection settings.')
+// param vngClientConnectionConfigurations array = []
 
 
 // ================//
@@ -318,13 +318,13 @@ var vpnClientConfiguration = !empty(clientRootCertData)
     }
   ]
   : null
-}
-: !empty(radiusServers) 
-? {
-  radiusServers: radiusServers
-  radiusServerSecret: radiusServerSecret
-  vpnClientIpsecPolicies: vpnClientIpsecPolicies
-  vpnClientRootCertificates: vpnClientRootCertificates
+// }
+// : !empty(radiusServers) 
+// ? {
+//   radiusServers: radiusServers
+//   radiusServerSecret: radiusServerSecret
+//   vpnClientIpsecPolicies: vpnClientIpsecPolicies
+//   vpnClientRootCertificates: vpnClientRootCertificates
 } 
 : !empty(vpnClientAadConfiguration)
 ? {
@@ -339,10 +339,10 @@ var vpnClientConfiguration = !empty(clientRootCertData)
   vpnAuthenticationTypes: vpnClientAadConfiguration.vpnAuthenticationTypes
   vpnClientProtocols: vpnClientAadConfiguration.vpnClientProtocols
 }
-: !empty(vngClientConnectionConfigurations)
-? {
-  vngClientConnectionConfigurations: vngClientConnectionConfigurations
-}
+// : !empty(vngClientConnectionConfigurations)
+// ? {
+//   vngClientConnectionConfigurations: vngClientConnectionConfigurations
+// }
 : null
 
 var builtInRoleNames = {
@@ -456,11 +456,11 @@ resource virtualNetworkGateway 'Microsoft.Network/virtualNetworkGateways@2024-03
     vpnType: vpnTypeVar
     vpnClientConfiguration: !empty(vpnClientAddressPoolPrefix) ? vpnClientConfiguration : null
     vpnGatewayGeneration: gatewayType == 'Vpn' ? vpnGatewayGeneration : 'None'
-    adminState: adminState    
-    customRoutes: customRoutes
-    autoScaleConfiguration: autoScaleConfiguration
-    virtualNetworkGatewayPolicyGroups: virtualNetworkGatewayPolicyGroups
-    vNetExtendedLocationResourceId: vNetExtendedLocationResourceId    
+    // adminState: adminState    
+    // customRoutes: customRoutes
+    // autoScaleConfiguration: autoScaleConfiguration
+    // virtualNetworkGatewayPolicyGroups: virtualNetworkGatewayPolicyGroups
+    // vNetExtendedLocationResourceId: vNetExtendedLocationResourceId    
   }
   dependsOn: [
     publicIPAddress

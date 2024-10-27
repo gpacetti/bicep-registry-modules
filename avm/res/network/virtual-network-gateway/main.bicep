@@ -131,12 +131,12 @@ param enableTelemetry bool = true
 @description('Optional. Configuration for AAD Authentication for P2S Tunnel Type, Cannot be configured if clientRootCertData is provided.')
 param vpnClientAadConfiguration object = {}
 
-// @description('Optional. Specifies administrative state of the Virtual Network Gateway.')
-// @allowed([
-//   'Enabled'
-//   'Disabled'
-// ])
-// param adminState string = 'Enabled'
+@description('Optional. Specifies administrative state of the Virtual Network Gateway.')
+@allowed([
+  'Enabled'
+  'Disabled'
+])
+param adminState string = 'Enabled'
 
 // @description('Optional. The Radius server configuration for VPN clients.')
 // param radiusServers radiusServerType []?
@@ -151,18 +151,18 @@ param vpnClientAadConfiguration object = {}
 // @description('Optional. Configuration for VPN Client Root Certificates.')
 // param vpnClientRootCertificates array = []
 
-// @description('Optional. The custom routes for the Virtual Network Gateway.')
-// param customRoutes object = {
-//   addressPrefixes: []
-// }
+@description('Optional. The custom routes for the Virtual Network Gateway.')
+param customRoutes object = {
+  addressPrefixes: []
+}
 
-// @description('Optional. The configuration for Auto-Scaling. Minimum and Maximum bounds.')
-// param autoScaleConfiguration object = {
-//   bounds: {
-//     min: 1
-//     max: 10
-//   }
-// }
+@description('Optional. The configuration for Auto-Scaling. Minimum and Maximum bounds.')
+param autoScaleConfiguration object = {
+  bounds: {
+    min: 1
+    max: 10
+  }
+}
 
 // @description('Optional. Virtual Network Gateway Policy Groups.')
 // param virtualNetworkGatewayPolicyGroups virtualNetworkGatewayPolicyGroupType []?
@@ -456,9 +456,9 @@ resource virtualNetworkGateway 'Microsoft.Network/virtualNetworkGateways@2024-03
     vpnType: vpnTypeVar
     vpnClientConfiguration: !empty(vpnClientAddressPoolPrefix) ? vpnClientConfiguration : null
     vpnGatewayGeneration: gatewayType == 'Vpn' ? vpnGatewayGeneration : 'None'
-    // adminState: adminState    
-    // customRoutes: customRoutes
-    // autoScaleConfiguration: autoScaleConfiguration
+    adminState: adminState    
+    customRoutes: customRoutes
+    autoScaleConfiguration: autoScaleConfiguration
     // virtualNetworkGatewayPolicyGroups: virtualNetworkGatewayPolicyGroups
     // vNetExtendedLocationResourceId: vNetExtendedLocationResourceId    
   }

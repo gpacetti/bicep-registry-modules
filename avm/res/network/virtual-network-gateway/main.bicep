@@ -293,14 +293,6 @@ var ipConfiguration = isActiveActive
   }
 ]
 
-var radiusServerArray = [
-  for server in radiusServers: {
-    radiusServerAddress: server.radiusServerAddress
-    radiusServerSecret: server.radiusServerSecret
-    radiusServerScore: server.radiusServerScore
-  }
-]
-
 var vpnClientConfiguration = !empty(clientRootCertData)
 ? {
   vpnClientAddressPool: {
@@ -329,7 +321,7 @@ var vpnClientConfiguration = !empty(clientRootCertData)
 }
 : !empty(radiusServers) 
 ? {
-  radiusServers: radiusServerArray
+  radiusServers: radiusServers
   radiusServerSecret: radiusServerSecret
   vpnClientIpsecPolicies: vpnClientIpsecPolicies
   vpnClientRootCertificates: vpnClientRootCertificates

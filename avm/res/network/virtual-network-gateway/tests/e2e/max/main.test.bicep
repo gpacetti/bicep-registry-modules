@@ -72,6 +72,17 @@ module testDeployment '../../../main.bicep' = [
       skuName: 'VpnGw2AZ'
       gatewayType: 'Vpn'
       vNetResourceId: nestedDependencies.outputs.vnetResourceId
+      adminState: 'Enabled'
+      customRoutes: {
+        route1: {
+          name: 'customRoute1'
+          addressPrefix: '172.16.0.0/24'
+        }
+        route2: {
+          name: 'customRoute2'
+          addressPrefix: '172.16.1.0/24'
+        }
+      }
       clusterSettings:{
         clusterMode: 'activeActiveBgp'
         secondPipName: '${namePrefix}${serviceShort}001-pip2'

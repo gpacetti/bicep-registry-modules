@@ -131,55 +131,6 @@ param enableTelemetry bool = true
 @description('Optional. Configuration for AAD Authentication for P2S Tunnel Type, Cannot be configured if clientRootCertData is provided.')
 param vpnClientAadConfiguration object = {}
 
-@description('Optional. Specifies administrative state of the Virtual Network Gateway.')
-@allowed([
-  'Enabled'
-  'Disabled'
-])
-param adminState string = 'Enabled'
-
-@description('Optional. The Radius server configuration for VPN clients.')
-param radiusServers radiusServerType []
-
-@description('Optional. The radius secret property of the VirtualNetworkGateway resource for vpn client connection.')
-@secure()
-param radiusServerSecret string
-
-@description('Optional. VPN client IPsec policies for virtual network gateway P2S client.')
-param vpnClientIpsecPolicies ipsecPolicyType []
-
-@description('Optional. Configuration for VPN Client Root Certificates.')
-param vpnClientRootCertificates array = []
-
-@description('Optional. The custom routes for the Virtual Network Gateway.')
-param customRoutes object = {
-  addressPrefixes: []
-}
-
-@description('Optional. The configuration for Auto-Scaling. Minimum and Maximum bounds.')
-param autoScaleConfiguration object = {
-  bounds: {
-    min: 1
-    max: 10
-  }
-}
-
-@description('Optional. Virtual Network Gateway Policy Groups.')
-param virtualNetworkGatewayPolicyGroups virtualNetworkGatewayPolicyGroupType []
-
-@description('Optional. Extended Location Resource ID for VNET.')
-param vNetExtendedLocationResourceId string = ''
-
-@description('Optional. Specifies the extended location for this resource.')
-param extendedLocation object = {
-  name: ''
-  type: 'EdgeZone'
-}
-
-@description('Optional. Configurations for VPN client connection settings.')
-param vngClientConnectionConfigurations array = []
-
-
 // ================//
 // Variables       //
 // ================//
@@ -200,158 +151,139 @@ var existingSecondPipResourceIdVar = isActiveActive ? clusterSettings.?existingS
 var secondPipNameVar = isActiveActive ? (clusterSettings.?secondPipName ?? '${name}-pip2') : null
 
 var arrayPipNameVar = isActiveActive
-? concat(
-  !empty(existingFirstPipResourceId)
-  ? []
-  : [firstPipName],
-  !empty(existingSecondPipResourceIdVar)
-  ? []
-  : [secondPipNameVar]
-)
-: concat(
-  !empty(existingFirstPipResourceId)
-  ? []
-  : [firstPipName]
-)
+  ? concat(
+      !empty(existingFirstPipResourceId)
+        ? []
+        : [firstPipName],
+      !empty(existingSecondPipResourceIdVar)
+        ? []
+        : [secondPipNameVar]
+    )
+  : concat(
+      !empty(existingFirstPipResourceId)
+        ? []
+        : [firstPipName]
+    )
 
 // Potential BGP configurations (Active-Active vs Active-Passive)
 var bgpSettingsVar = isActiveActive
-? {
-  asn: clusterSettings.?asn ?? 65515
-  bgpPeeringAddresses: [
-    {
-      customBgpIpAddresses: clusterSettings.?customBgpIpAddresses
-      ipconfigurationId: '${az.resourceId('Microsoft.Network/virtualNetworkGateways', name)}/ipConfigurations/vNetGatewayConfig1'
+  ? {
+      asn: clusterSettings.?asn ?? 65515
+      bgpPeeringAddresses: [
+        {
+          customBgpIpAddresses: clusterSettings.?customBgpIpAddresses
+          ipconfigurationId: '${az.resourceId('Microsoft.Network/virtualNetworkGateways', name)}/ipConfigurations/vNetGatewayConfig1'
+        }
+        {
+          customBgpIpAddresses: clusterSettings.?secondCustomBgpIpAddresses
+          ipconfigurationId: '${az.resourceId('Microsoft.Network/virtualNetworkGateways', name)}/ipConfigurations/vNetGatewayConfig2'
+        }
+      ]
     }
-    {
-      customBgpIpAddresses: clusterSettings.?secondCustomBgpIpAddresses
-      ipconfigurationId: '${az.resourceId('Microsoft.Network/virtualNetworkGateways', name)}/ipConfigurations/vNetGatewayConfig2'
+  : {
+      asn: clusterSettings.?asn ?? 65515
+      bgpPeeringAddresses: [
+        {
+          customBgpIpAddresses: clusterSettings.?customBgpIpAddresses
+          ipconfigurationId: '${az.resourceId('Microsoft.Network/virtualNetworkGateways', name)}/ipConfigurations/vNetGatewayConfig1'
+        }
+      ]
     }
-  ]
-}
-: {
-  asn: clusterSettings.?asn ?? 65515
-  bgpPeeringAddresses: [
-    {
-      customBgpIpAddresses: clusterSettings.?customBgpIpAddresses
-      ipconfigurationId: '${az.resourceId('Microsoft.Network/virtualNetworkGateways', name)}/ipConfigurations/vNetGatewayConfig1'
-    }
-  ]
-}
 
 // Potential IP configurations (Active-Active vs Active-Passive)
 var ipConfiguration = isActiveActive
-? [
-  {
-    properties: {
-      privateIPAllocationMethod: 'Dynamic'
-      subnet: {
-        id: '${vNetResourceId}/subnets/GatewaySubnet'
+  ? [
+      {
+        properties: {
+          privateIPAllocationMethod: 'Dynamic'
+          subnet: {
+            id: '${vNetResourceId}/subnets/GatewaySubnet'
+          }
+          // Use existing Public IP, new Public IP created in this module
+          publicIPAddress: {
+            id: !empty(existingFirstPipResourceId)
+              ? existingFirstPipResourceId
+              : az.resourceId('Microsoft.Network/publicIPAddresses', firstPipName)
+          }
+        }
+        name: 'vNetGatewayConfig1'
       }
-      // Use existing Public IP, new Public IP created in this module
-      publicIPAddress: {
-        id: !empty(existingFirstPipResourceId)
-        ? existingFirstPipResourceId
-        : az.resourceId('Microsoft.Network/publicIPAddresses', firstPipName)
+      {
+        properties: {
+          privateIPAllocationMethod: 'Dynamic'
+          subnet: {
+            id: '${vNetResourceId}/subnets/GatewaySubnet'
+          }
+          publicIPAddress: {
+            id: isActiveActive
+            ? !empty(existingSecondPipResourceIdVar)
+            ? existingSecondPipResourceIdVar
+            : az.resourceId('Microsoft.Network/publicIPAddresses', secondPipNameVar)
+          : !empty(existingFirstPipResourceId)
+            ? existingFirstPipResourceId
+            : az.resourceId('Microsoft.Network/publicIPAddresses', firstPipName)
+          }
+        }
+        name: 'vNetGatewayConfig2'
       }
-    }
-    name: 'vNetGatewayConfig1'
-  }
-  {
-    properties: {
-      privateIPAllocationMethod: 'Dynamic'
-      subnet: {
-        id: '${vNetResourceId}/subnets/GatewaySubnet'
+    ]
+  : [
+      {
+        properties: {
+          privateIPAllocationMethod: 'Dynamic'
+          subnet: {
+            id: '${vNetResourceId}/subnets/GatewaySubnet'
+          }
+          publicIPAddress: {
+            id: !empty(existingFirstPipResourceId)
+              ? existingFirstPipResourceId
+              : az.resourceId('Microsoft.Network/publicIPAddresses', firstPipName)
+          }
+        }
+        name: 'vNetGatewayConfig1'
       }
-      publicIPAddress: {
-        id: isActiveActive
-        ? !empty(existingSecondPipResourceIdVar)
-        ? existingSecondPipResourceIdVar
-        : az.resourceId('Microsoft.Network/publicIPAddresses', secondPipNameVar)
-        : !empty(existingFirstPipResourceId)
-        ? existingFirstPipResourceId
-        : az.resourceId('Microsoft.Network/publicIPAddresses', firstPipName)
-      }
-    }
-    name: 'vNetGatewayConfig2'
-  }
-]
-: [
-  {
-    properties: {
-      privateIPAllocationMethod: 'Dynamic'
-      subnet: {
-        id: '${vNetResourceId}/subnets/GatewaySubnet'
-      }
-      publicIPAddress: {
-        id: !empty(existingFirstPipResourceId)
-        ? existingFirstPipResourceId
-        : az.resourceId('Microsoft.Network/publicIPAddresses', firstPipName)
-      }
-    }
-    name: 'vNetGatewayConfig1'
-  }
-]
-
-var radiusServerArray = [
-  for server in radiusServers: {
-    radiusServerAddress: server.radiusServerAddress
-    radiusServerSecret: server.radiusServerSecret
-    radiusServerScore: server.radiusServerScore
-  }
-]
+    ]
 
 var vpnClientConfiguration = !empty(clientRootCertData)
-? {
-  vpnClientAddressPool: {
-    addressPrefixes: [
-      vpnClientAddressPoolPrefix
-    ]
-  }
-  vpnClientRootCertificates: [
-    {
-      name: 'RootCert1'
-      properties: {
-        publicCertData: clientRootCertData
+  ? {
+      vpnClientAddressPool: {
+        addressPrefixes: [
+          vpnClientAddressPoolPrefix
+        ]
       }
+      vpnClientRootCertificates: [
+        {
+          name: 'RootCert1'
+          properties: {
+            publicCertData: clientRootCertData
+          }
+        }
+      ]
+      vpnClientRevokedCertificates: !empty(clientRevokedCertThumbprint)
+        ? [
+            {
+              name: 'RevokedCert1'
+              properties: {
+                thumbprint: clientRevokedCertThumbprint
+              }
+            }
+          ]
+        : null
     }
-  ]
-  vpnClientRevokedCertificates: !empty(clientRevokedCertThumbprint)
-  ? [
-    {
-      name: 'RevokedCert1'
-      properties: {
-        thumbprint: clientRevokedCertThumbprint
-      }
-    }
-  ]
-  : null
-}
-: !empty(radiusServers) 
-? {
-  radiusServers: radiusServerArray
-  radiusServerSecret: radiusServerSecret
-  vpnClientIpsecPolicies: vpnClientIpsecPolicies
-  vpnClientRootCertificates: vpnClientRootCertificates
-} 
-: !empty(vpnClientAadConfiguration)
-? {
-  vpnClientAddressPool: {
-    addressPrefixes: [
-      vpnClientAddressPoolPrefix
-    ]
-  }
-  aadTenant: vpnClientAadConfiguration.aadTenant
-  aadAudience: vpnClientAadConfiguration.aadAudience
-  aadIssuer: vpnClientAadConfiguration.aadIssuer
-  vpnAuthenticationTypes: vpnClientAadConfiguration.vpnAuthenticationTypes
-  vpnClientProtocols: vpnClientAadConfiguration.vpnClientProtocols
-}
-: !empty(vngClientConnectionConfigurations)
-? {
-  vngClientConnectionConfigurations: vngClientConnectionConfigurations
-}
-: null
+  : !empty(vpnClientAadConfiguration)
+      ? {
+          vpnClientAddressPool: {
+            addressPrefixes: [
+              vpnClientAddressPoolPrefix
+            ]
+          }
+          aadTenant: vpnClientAadConfiguration.aadTenant
+          aadAudience: vpnClientAadConfiguration.aadAudience
+          aadIssuer: vpnClientAadConfiguration.aadIssuer
+          vpnAuthenticationTypes: vpnClientAadConfiguration.vpnAuthenticationTypes
+          vpnClientProtocols: vpnClientAadConfiguration.vpnClientProtocols
+        }
+      : null
 
 var builtInRoleNames = {
   Contributor: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')
@@ -374,11 +306,11 @@ var builtInRoleNames = {
 var formattedRoleAssignments = [
   for (roleAssignment, index) in (roleAssignments ?? []): union(roleAssignment, {
     roleDefinitionId: builtInRoleNames[?roleAssignment.roleDefinitionIdOrName] ?? (contains(
-      roleAssignment.roleDefinitionIdOrName,
-      '/providers/Microsoft.Authorization/roleDefinitions/'
-    )
-    ? roleAssignment.roleDefinitionIdOrName
-    : subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleAssignment.roleDefinitionIdOrName))
+        roleAssignment.roleDefinitionIdOrName,
+        '/providers/Microsoft.Authorization/roleDefinitions/'
+      )
+      ? roleAssignment.roleDefinitionIdOrName
+      : subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleAssignment.roleDefinitionIdOrName))
   })
 ]
 
@@ -425,8 +357,8 @@ module publicIPAddress 'br/public:avm/res/network/public-ip-address:0.5.1' = [
       zones: skuName != 'Basic' ? publicIpZones : []
       dnsSettings: {
         domainNameLabel: length(arrayPipNameVar) == length(domainNameLabel)
-        ? domainNameLabel[index]
-        : virtualGatewayPublicIpName
+          ? domainNameLabel[index]
+          : virtualGatewayPublicIpName
         domainNameLabelScope: ''
       }
     }
@@ -435,11 +367,10 @@ module publicIPAddress 'br/public:avm/res/network/public-ip-address:0.5.1' = [
 
 // VNET Gateway
 // ============
-resource virtualNetworkGateway 'Microsoft.Network/virtualNetworkGateways@2024-03-01' = {
+resource virtualNetworkGateway 'Microsoft.Network/virtualNetworkGateways@2023-04-01' = {
   name: name
   location: location
   tags: tags
-  extendedLocation: !empty(extendedLocation.name) ? extendedLocation : {}
   properties: {
     ipConfigurations: ipConfiguration
     activeActive: isActiveActive
@@ -453,10 +384,10 @@ resource virtualNetworkGateway 'Microsoft.Network/virtualNetworkGateways@2024-03
     enableBgpRouteTranslationForNat: enableBgpRouteTranslationForNat
     gatewayType: gatewayType
     gatewayDefaultSite: !empty(gatewayDefaultSiteLocalNetworkGatewayId)
-    ? {
-      id: gatewayDefaultSiteLocalNetworkGatewayId
-    }
-    : null
+      ? {
+          id: gatewayDefaultSiteLocalNetworkGatewayId
+        }
+      : null
     sku: {
       name: skuName
       tier: skuName
@@ -464,11 +395,6 @@ resource virtualNetworkGateway 'Microsoft.Network/virtualNetworkGateways@2024-03
     vpnType: vpnTypeVar
     vpnClientConfiguration: !empty(vpnClientAddressPoolPrefix) ? vpnClientConfiguration : null
     vpnGatewayGeneration: gatewayType == 'Vpn' ? vpnGatewayGeneration : 'None'
-    adminState: adminState    
-    customRoutes: customRoutes
-    autoScaleConfiguration: autoScaleConfiguration
-    virtualNetworkGatewayPolicyGroups: virtualNetworkGatewayPolicyGroups
-    vNetExtendedLocationResourceId: vNetExtendedLocationResourceId    
   }
   dependsOn: [
     publicIPAddress
@@ -495,8 +421,8 @@ resource virtualNetworkGateway_lock 'Microsoft.Authorization/locks@2020-05-01' =
   properties: {
     level: lock.?kind ?? ''
     notes: lock.?kind == 'CanNotDelete'
-    ? 'Cannot delete resource or child resources.'
-    : 'Cannot delete or modify the resource or child resources.'
+      ? 'Cannot delete resource or child resources.'
+      : 'Cannot delete or modify the resource or child resources.'
   }
   scope: virtualNetworkGateway
 }
@@ -651,25 +577,25 @@ type diagnosticSettingType = {
 }[]?
 
 type activePassiveNoBgpType = {
-
+  
   clusterMode: 'activePassiveNoBgp'
 
 }
 
 type activeActiveNoBgpType = {
-
+  
   clusterMode: 'activeActiveNoBgp'
 
   @description('Optional. The secondary Public IP resource ID to associate to the Virtual Network Gateway in the Active-Active mode. If empty, then a new secondary Public IP will be created as part of this module and applied to the Virtual Network Gateway.')
   existingSecondPipResourceId: string?
-
+  
   @description('Optional. Specifies the name of the secondary Public IP to be created for the Virtual Network Gateway in the Active-Active mode. This will only take effect if no existing secondary Public IP is provided. If neither an existing secondary Public IP nor this parameter is specified, a new secondary Public IP will be created with a default name, using the gateway\'s name with the \'-pip2\' suffix.')
   secondPipName: string?
 
 }
 
 type activePassiveBgpType = {
-
+  
   clusterMode: 'activePassiveBgp'
 
   @description('Optional. The Autonomous System Number value. If it\'s not provided, a default \'65515\' value will be assigned to the ASN.')
@@ -682,15 +608,15 @@ type activePassiveBgpType = {
 }
 
 type activeActiveBgpType = {
-
+  
   clusterMode: 'activeActiveBgp'
 
   @description('Optional. The secondary Public IP resource ID to associate to the Virtual Network Gateway in the Active-Active mode. If empty, then a new secondary Public IP will be created as part of this module and applied to the Virtual Network Gateway.')
   existingSecondPipResourceId: string?
-
+  
   @description('Optional. Specifies the name of the secondary Public IP to be created for the Virtual Network Gateway in the Active-Active mode. This will only take effect if no existing secondary Public IP is provided. If neither an existing secondary Public IP nor this parameter is specified, a new secondary Public IP will be created with a default name, using the gateway\'s name with the \'-pip2\' suffix.')
   secondPipName: string?
-
+  
   @description('Optional. The Autonomous System Number value. If it\'s not provided, a default \'65515\' value will be assigned to the ASN.')
   @minValue(0)
   @maxValue(4294967295)
@@ -704,40 +630,3 @@ type activeActiveBgpType = {
 
 @discriminator('clusterMode')
 type clusterSettingType = activeActiveNoBgpType | activeActiveBgpType | activePassiveBgpType | activePassiveNoBgpType
-
-type radiusServerType = {
-  @description ('Required. The address of the Radius server.')
-  radiusServerAddress: string
-  @description ('Required. The initial score assigned to the Radius server.')
-  radiusServerScore: int
-  @description ('Required. The secret used for the Radius server.') 
-  radiusServerSecret: string
-}
-
-type ipsecPolicyType = {
-  @description ('Required. The DH Group used in IKE Phase 1 for initial SA.')
-  dhGroup: ('DHGroup1' | 'DHGroup14' | 'DHGroup2' |  'DHGroup2048' | 'DHGroup24' | 'ECP256' | 'ECP384' | 'None')?
-  @description ('Required. The IKE encryption algorithm (IKE phase 2).')
-  ikeEncryption: ('AES128' | 'AES192' | 'AES256' | 'DES' | 'DES3' | 'GCMAES128' | 'GCMAES256')
-  @description ('Required. The IKE integrity algorithm (IKE phase 2).')
-  ikeIntegrity: ('GCMAES128' | 'GCMAES256' | 'MD5' | 'SHA1' | 'SHA256' | 'SHA384')
-  @description ('Required. The IPSec encryption algorithm (IKE phase 1).')
-  ipsecEncryption: ('AES128' | 'AES192' | 'AES256' | 'DES' | 'DES3' | 'GCMAES128' | 'GCMAES192' | 'GCMAES256' | 'None')
-  @description ('Required. The IPSec integrity algorithm (IKE phase 1).')
-  ipsecIntegrity: ('GCMAES128' | 'GCMAES192' | 'GCMAES256' | 'MD5' | 'SHA1' | 'SHA256')
-  @description ('Required. The Pfs Group used in IKE Phase 2 for new child SA.')
-  pfsGroup: ('ECP256' | 'ECP384' | 'None' | 'PFS1' | 'PFS14' | 'PFS2' | 'PFS2048' | 'PFS24' | 'PFSMM')
-  @description ('Required. The IPSec Security Association (also called Quick Mode or Phase 2 SA) payload size in KB for a site to site VPN tunnel.')
-  saDataSizeKilobytes: int
-  @description ('Required. The IPSec Security Association (also called Quick Mode or Phase 2 SA) lifetime in seconds for a site to site VPN tunnel.')
-  saLifeTimeSeconds: int
-}
-
-type virtualNetworkGatewayPolicyGroupType = {
-  @description ('Optional. Resource ID of the Virtual Network Gateway Policy Group.')
-  id: string
-  properties: {
-  @description ('Optional. Priority of the Virtual Network Gateway Policy Group.')
-    priority: int 
-  }
-}

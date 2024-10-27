@@ -430,7 +430,7 @@ module publicIPAddress 'br/public:avm/res/network/public-ip-address:0.5.1' = [
 resource virtualNetworkGateway 'Microsoft.Network/virtualNetworkGateways@2024-03-01' = {
   name: name
   location: location
-  //tags: tags
+  tags: tags
   extendedLocation: !empty(extendedLocation.name) ? extendedLocation : {}
   properties: {
     ipConfigurations: ipConfiguration

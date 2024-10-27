@@ -710,15 +710,15 @@ type ipsecPolicyType = {
   @description ('Required. The DH Group used in IKE Phase 1 for initial SA.')
   dhGroup: ('DHGroup1' | 'DHGroup14' | 'DHGroup2' |  'DHGroup2048' | 'DHGroup24' | 'ECP256' | 'ECP384' | 'None')?
   @description ('Required. The IKE encryption algorithm (IKE phase 2).')
-  ikeEncryption: ('AES128' | 'AES192' | 'AES256' | 'DES' | 'DES3' | 'GCMAES128' | 'GCMAES256')
+  ikeEncryption: ('AES128' | 'AES192' | 'AES256' | 'DES' | 'DES3' | 'GCMAES128' | 'GCMAES256')?
   @description ('Required. The IKE integrity algorithm (IKE phase 2).')
-  ikeIntegrity: ('GCMAES128' | 'GCMAES256' | 'MD5' | 'SHA1' | 'SHA256' | 'SHA384')
+  ikeIntegrity: ('GCMAES128' | 'GCMAES256' | 'MD5' | 'SHA1' | 'SHA256' | 'SHA384')?
   @description ('Required. The IPSec encryption algorithm (IKE phase 1).')
-  ipsecEncryption: ('AES128' | 'AES192' | 'AES256' | 'DES' | 'DES3' | 'GCMAES128' | 'GCMAES192' | 'GCMAES256' | 'None')
+  ipsecEncryption: ('AES128' | 'AES192' | 'AES256' | 'DES' | 'DES3' | 'GCMAES128' | 'GCMAES192' | 'GCMAES256' | 'None')?
   @description ('Required. The IPSec integrity algorithm (IKE phase 1).')
-  ipsecIntegrity: ('GCMAES128' | 'GCMAES192' | 'GCMAES256' | 'MD5' | 'SHA1' | 'SHA256')
+  ipsecIntegrity: ('GCMAES128' | 'GCMAES192' | 'GCMAES256' | 'MD5' | 'SHA1' | 'SHA256')?
   @description ('Required. The Pfs Group used in IKE Phase 2 for new child SA.')
-  pfsGroup: ('ECP256' | 'ECP384' | 'None' | 'PFS1' | 'PFS14' | 'PFS2' | 'PFS2048' | 'PFS24' | 'PFSMM')
+  pfsGroup: ('ECP256' | 'ECP384' | 'None' | 'PFS1' | 'PFS14' | 'PFS2' | 'PFS2048' | 'PFS24' | 'PFSMM')?
   @description ('Required. The IPSec Security Association (also called Quick Mode or Phase 2 SA) payload size in KB for a site to site VPN tunnel.')
   saDataSizeKilobytes: int
   @description ('Required. The IPSec Security Association (also called Quick Mode or Phase 2 SA) lifetime in seconds for a site to site VPN tunnel.')

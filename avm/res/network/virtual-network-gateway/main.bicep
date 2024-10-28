@@ -141,6 +141,9 @@ param adminState string = 'Enabled'
 @description('Optional. The Radius server configuration for VPN clients.')
 param radiusServers radiusServerType []?
 
+@description('Optional. The radius server address property of the VirtualNetworkGateway resource for vpn client connection.')
+param radiusServerAddress string ?
+
 @description('Optional. The radius secret property of the VirtualNetworkGateway resource for vpn client connection.')
 @secure()
 param radiusServerSecret string?
@@ -318,6 +321,7 @@ var vpnClientConfiguration = !empty(clientRootCertData)
 }
 : !empty(radiusServers) 
 ? {
+  radiusServerAddress: radiusServerAddress
   radiusServers: radiusServers
   radiusServerSecret: radiusServerSecret
   vpnClientIpsecPolicies: vpnClientIpsecPolicies

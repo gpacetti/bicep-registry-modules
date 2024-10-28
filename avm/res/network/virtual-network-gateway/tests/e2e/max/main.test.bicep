@@ -76,6 +76,21 @@ module testDeployment '../../../main.bicep' = [
       customRoutes: {
         addressPrefixes: ['172.16.0.0/24', '172.16.1.0/24']
       }
+      autoScaleConfiguration: {
+        bounds: {
+          max: 2
+          min: 1
+        }
+      }
+      radiusServerAddress: '172.16.0.122'
+      radiusServerSecret: 'T35t@53cr3t'
+      radiusServers: [
+        {
+          radiusServerAddress: '172.16.0.123'
+          radiusServerSecret: 'T35t@53cr3t'
+          radiusServerScore: 1
+        }
+      ]
       clusterSettings:{
         clusterMode: 'activeActiveBgp'
         secondPipName: '${namePrefix}${serviceShort}001-pip2'

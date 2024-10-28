@@ -74,14 +74,7 @@ module testDeployment '../../../main.bicep' = [
       vNetResourceId: nestedDependencies.outputs.vnetResourceId
       adminState: 'Enabled'
       customRoutes: {
-        route1: {
-          name: 'customRoute1'
-          addressPrefix: '172.16.0.0/24'
-        }
-        route2: {
-          name: 'customRoute2'
-          addressPrefix: '172.16.1.0/24'
-        }
+        addressPrefixes: ['172.16.0.0/24', '172.16.1.0/24']
       }
       clusterSettings:{
         clusterMode: 'activeActiveBgp'

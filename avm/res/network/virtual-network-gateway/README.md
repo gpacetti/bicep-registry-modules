@@ -19,7 +19,7 @@ This module deploys a Virtual Network Gateway.
 | `Microsoft.Authorization/roleAssignments` | [2022-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2022-04-01/roleAssignments) |
 | `Microsoft.Insights/diagnosticSettings` | [2021-05-01-preview](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Insights/2021-05-01-preview/diagnosticSettings) |
 | `Microsoft.Network/publicIPAddresses` | [2023-09-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2023-09-01/publicIPAddresses) |
-| `Microsoft.Network/virtualNetworkGateways` | [2023-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2023-04-01/virtualNetworkGateways) |
+| `Microsoft.Network/virtualNetworkGateways` | [2024-03-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2024-03-01/virtualNetworkGateways) |
 | `Microsoft.Network/virtualNetworkGateways/natRules` | [2023-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Network/2023-04-01/virtualNetworkGateways/natRules) |
 
 ## Usage examples
@@ -1442,7 +1442,20 @@ module virtualNetworkGateway 'br/public:avm/res/network/virtual-network-gateway:
     name: 'nvgmax001'
     vNetResourceId: '<vNetResourceId>'
     // Non-required parameters
+    adminState: 'Enabled'
     allowRemoteVnetTraffic: true
+    autoScaleConfiguration: {
+      bounds: {
+        max: 2
+        min: 1
+      }
+    }
+    customRoutes: {
+      addressPrefixes: [
+        '172.16.0.0/24'
+        '172.16.1.0/24'
+      ]
+    }
     diagnosticSettings: [
       {
         eventHubAuthorizationRuleResourceId: '<eventHubAuthorizationRuleResourceId>'
@@ -1508,6 +1521,15 @@ module virtualNetworkGateway 'br/public:avm/res/network/virtual-network-gateway:
       2
       3
     ]
+    radiusServerAddress: '172.16.0.122'
+    radiusServers: [
+      {
+        radiusServerAddress: '172.16.0.123'
+        radiusServerScore: 1
+        radiusServerSecret: 'T35t@53cr3t'
+      }
+    ]
+    radiusServerSecret: 'T35t@53cr3t'
     roleAssignments: [
       {
         name: 'db30550e-70b7-4dbe-901e-e9363b69c05f'
@@ -1576,8 +1598,27 @@ module virtualNetworkGateway 'br/public:avm/res/network/virtual-network-gateway:
       "value": "<vNetResourceId>"
     },
     // Non-required parameters
+    "adminState": {
+      "value": "Enabled"
+    },
     "allowRemoteVnetTraffic": {
       "value": true
+    },
+    "autoScaleConfiguration": {
+      "value": {
+        "bounds": {
+          "max": 2,
+          "min": 1
+        }
+      }
+    },
+    "customRoutes": {
+      "value": {
+        "addressPrefixes": [
+          "172.16.0.0/24",
+          "172.16.1.0/24"
+        ]
+      }
     },
     "diagnosticSettings": {
       "value": [
@@ -1664,6 +1705,21 @@ module virtualNetworkGateway 'br/public:avm/res/network/virtual-network-gateway:
         3
       ]
     },
+    "radiusServerAddress": {
+      "value": "172.16.0.122"
+    },
+    "radiusServers": {
+      "value": [
+        {
+          "radiusServerAddress": "172.16.0.123",
+          "radiusServerScore": 1,
+          "radiusServerSecret": "T35t@53cr3t"
+        }
+      ]
+    },
+    "radiusServerSecret": {
+      "value": "T35t@53cr3t"
+    },
     "roleAssignments": {
       "value": [
         {
@@ -1732,7 +1788,20 @@ param gatewayType = 'Vpn'
 param name = 'nvgmax001'
 param vNetResourceId = '<vNetResourceId>'
 // Non-required parameters
+param adminState = 'Enabled'
 param allowRemoteVnetTraffic = true
+param autoScaleConfiguration = {
+  bounds: {
+    max: 2
+    min: 1
+  }
+}
+param customRoutes = {
+  addressPrefixes: [
+    '172.16.0.0/24'
+    '172.16.1.0/24'
+  ]
+}
 param diagnosticSettings = [
   {
     eventHubAuthorizationRuleResourceId: '<eventHubAuthorizationRuleResourceId>'
@@ -1798,6 +1867,15 @@ param publicIpZones = [
   2
   3
 ]
+param radiusServerAddress = '172.16.0.122'
+param radiusServers = [
+  {
+    radiusServerAddress: '172.16.0.123'
+    radiusServerScore: 1
+    radiusServerSecret: 'T35t@53cr3t'
+  }
+]
+param radiusServerSecret = 'T35t@53cr3t'
 param roleAssignments = [
   {
     name: 'db30550e-70b7-4dbe-901e-e9363b69c05f'
@@ -2453,10 +2531,13 @@ param vpnType = 'RouteBased'
 
 | Parameter | Type | Description |
 | :-- | :-- | :-- |
+| [`adminState`](#parameter-adminstate) | string | Specifies administrative state of the Virtual Network Gateway. |
 | [`allowRemoteVnetTraffic`](#parameter-allowremotevnettraffic) | bool | Configure this gateway to accept traffic from other Azure Virtual Networks. This configuration does not support connectivity to Azure Virtual WAN. |
 | [`allowVirtualWanTraffic`](#parameter-allowvirtualwantraffic) | bool | Configures this gateway to accept traffic from remote Virtual WAN networks. |
+| [`autoScaleConfiguration`](#parameter-autoscaleconfiguration) | object | The configuration for Auto-Scaling. Minimum and Maximum bounds. |
 | [`clientRevokedCertThumbprint`](#parameter-clientrevokedcertthumbprint) | string | Thumbprint of the revoked certificate. This would revoke VPN client certificates matching this thumbprint from connecting to the VNet. |
 | [`clientRootCertData`](#parameter-clientrootcertdata) | string | Client root certificate data used to authenticate VPN clients. Cannot be configured if vpnClientAadConfiguration is provided. |
+| [`customRoutes`](#parameter-customroutes) | object | The custom routes for the Virtual Network Gateway. |
 | [`diagnosticSettings`](#parameter-diagnosticsettings) | array | The diagnostic settings of the service. |
 | [`disableIPSecReplayProtection`](#parameter-disableipsecreplayprotection) | bool | disableIPSecReplayProtection flag. Used for VPN Gateways. |
 | [`domainNameLabel`](#parameter-domainnamelabel) | array | DNS name(s) of the Public IP resource(s). If you enabled Active-Active mode, you need to provide 2 DNS names, if you want to use this feature. A region specific suffix will be appended to it, e.g.: your-DNS-name.westeurope.cloudapp.azure.com. |
@@ -2465,6 +2546,7 @@ param vpnType = 'RouteBased'
 | [`enablePrivateIpAddress`](#parameter-enableprivateipaddress) | bool | Whether private IP needs to be enabled on this gateway for connections or not. Used for configuring a Site-to-Site VPN connection over ExpressRoute private peering. |
 | [`enableTelemetry`](#parameter-enabletelemetry) | bool | Enable/Disable usage telemetry for module. |
 | [`existingFirstPipResourceId`](#parameter-existingfirstpipresourceid) | string | The Public IP resource ID to associate to the Virtual Network Gateway. If empty, then a new Public IP will be created and applied to the Virtual Network Gateway. |
+| [`extendedLocation`](#parameter-extendedlocation) | object | Specifies the extended location for this resource. |
 | [`firstPipName`](#parameter-firstpipname) | string | Specifies the name of the Public IP to be created for the Virtual Network Gateway. This will only take effect if no existing Public IP is provided. If neither an existing Public IP nor this parameter is specified, a new Public IP will be created with a default name, using the gateway's name with the '-pip1' suffix. |
 | [`gatewayDefaultSiteLocalNetworkGatewayId`](#parameter-gatewaydefaultsitelocalnetworkgatewayid) | string | The reference to the LocalNetworkGateway resource which represents local network site having default routes. Assign Null value in case of removing existing default site setting. |
 | [`location`](#parameter-location) | string | Location for all resources. |
@@ -2473,10 +2555,18 @@ param vpnType = 'RouteBased'
 | [`publicIpDiagnosticSettings`](#parameter-publicipdiagnosticsettings) | array | The diagnostic settings of the Public IP. |
 | [`publicIPPrefixResourceId`](#parameter-publicipprefixresourceid) | string | Resource ID of the Public IP Prefix object. This is only needed if you want your Public IPs created in a PIP Prefix. |
 | [`publicIpZones`](#parameter-publicipzones) | array | Specifies the zones of the Public IP address. Basic IP SKU does not support Availability Zones. |
+| [`radiusServerAddress`](#parameter-radiusserveraddress) | string | The radius server address property of the VirtualNetworkGateway resource for vpn client connection. |
+| [`radiusServers`](#parameter-radiusservers) | array | The Radius server configuration for VPN clients. |
+| [`radiusServerSecret`](#parameter-radiusserversecret) | securestring | The radius secret property of the VirtualNetworkGateway resource for vpn client connection. |
 | [`roleAssignments`](#parameter-roleassignments) | array | Array of role assignments to create. |
 | [`tags`](#parameter-tags) | object | Tags of the resource. |
+| [`virtualNetworkGatewayPolicyGroups`](#parameter-virtualnetworkgatewaypolicygroups) | array | Virtual Network Gateway Policy Groups. |
+| [`vNetExtendedLocationResourceId`](#parameter-vnetextendedlocationresourceid) | string | Extended Location Resource ID for VNET. |
+| [`vngClientConnectionConfigurations`](#parameter-vngclientconnectionconfigurations) | array | Configurations for VPN client connection settings. |
 | [`vpnClientAadConfiguration`](#parameter-vpnclientaadconfiguration) | object | Configuration for AAD Authentication for P2S Tunnel Type, Cannot be configured if clientRootCertData is provided. |
 | [`vpnClientAddressPoolPrefix`](#parameter-vpnclientaddresspoolprefix) | string | The IP address range from which VPN clients will receive an IP address when connected. Range specified must not overlap with on-premise network. |
+| [`vpnClientIpsecPolicies`](#parameter-vpnclientipsecpolicies) | array | VPN client IPsec policies for virtual network gateway P2S client. |
+| [`vpnClientRootCertificates`](#parameter-vpnclientrootcertificates) | array | Configuration for VPN Client Root Certificates. |
 | [`vpnGatewayGeneration`](#parameter-vpngatewaygeneration) | string | The generation for this VirtualNetworkGateway. Must be None if virtualNetworkGatewayType is not VPN. |
 | [`vpnType`](#parameter-vpntype) | string | Specifies the VPN type. |
 
@@ -2545,6 +2635,21 @@ Virtual Network resource ID.
 - Required: Yes
 - Type: string
 
+### Parameter: `adminState`
+
+Specifies administrative state of the Virtual Network Gateway.
+
+- Required: No
+- Type: string
+- Default: `'Enabled'`
+- Allowed:
+  ```Bicep
+  [
+    'Disabled'
+    'Enabled'
+  ]
+  ```
+
 ### Parameter: `allowRemoteVnetTraffic`
 
 Configure this gateway to accept traffic from other Azure Virtual Networks. This configuration does not support connectivity to Azure Virtual WAN.
@@ -2561,6 +2666,22 @@ Configures this gateway to accept traffic from remote Virtual WAN networks.
 - Type: bool
 - Default: `False`
 
+### Parameter: `autoScaleConfiguration`
+
+The configuration for Auto-Scaling. Minimum and Maximum bounds.
+
+- Required: No
+- Type: object
+- Default:
+  ```Bicep
+  {
+      bounds: {
+        max: 10
+        min: 1
+      }
+  }
+  ```
+
 ### Parameter: `clientRevokedCertThumbprint`
 
 Thumbprint of the revoked certificate. This would revoke VPN client certificates matching this thumbprint from connecting to the VNet.
@@ -2576,6 +2697,19 @@ Client root certificate data used to authenticate VPN clients. Cannot be configu
 - Required: No
 - Type: string
 - Default: `''`
+
+### Parameter: `customRoutes`
+
+The custom routes for the Virtual Network Gateway.
+
+- Required: No
+- Type: object
+- Default:
+  ```Bicep
+  {
+      addressPrefixes: []
+  }
+  ```
 
 ### Parameter: `diagnosticSettings`
 
@@ -2778,6 +2912,13 @@ The Public IP resource ID to associate to the Virtual Network Gateway. If empty,
 - Required: No
 - Type: string
 - Default: `''`
+
+### Parameter: `extendedLocation`
+
+Specifies the extended location for this resource.
+
+- Required: No
+- Type: object
 
 ### Parameter: `firstPipName`
 
@@ -3016,6 +3157,56 @@ Specifies the zones of the Public IP address. Basic IP SKU does not support Avai
   ]
   ```
 
+### Parameter: `radiusServerAddress`
+
+The radius server address property of the VirtualNetworkGateway resource for vpn client connection.
+
+- Required: No
+- Type: string
+
+### Parameter: `radiusServers`
+
+The Radius server configuration for VPN clients.
+
+- Required: No
+- Type: array
+
+**Required parameters**
+
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`radiusServerAddress`](#parameter-radiusserversradiusserveraddress) | string | The address of the Radius server. |
+| [`radiusServerScore`](#parameter-radiusserversradiusserverscore) | int | The initial score assigned to the Radius server. |
+| [`radiusServerSecret`](#parameter-radiusserversradiusserversecret) | string | The secret used for the Radius server. |
+
+### Parameter: `radiusServers.radiusServerAddress`
+
+The address of the Radius server.
+
+- Required: Yes
+- Type: string
+
+### Parameter: `radiusServers.radiusServerScore`
+
+The initial score assigned to the Radius server.
+
+- Required: Yes
+- Type: int
+
+### Parameter: `radiusServers.radiusServerSecret`
+
+The secret used for the Radius server.
+
+- Required: Yes
+- Type: string
+
+### Parameter: `radiusServerSecret`
+
+The radius secret property of the VirtualNetworkGateway resource for vpn client connection.
+
+- Required: No
+- Type: securestring
+
 ### Parameter: `roleAssignments`
 
 Array of role assignments to create.
@@ -3127,6 +3318,42 @@ Tags of the resource.
 - Required: No
 - Type: object
 
+### Parameter: `virtualNetworkGatewayPolicyGroups`
+
+Virtual Network Gateway Policy Groups.
+
+- Required: No
+- Type: array
+
+**Optional parameters**
+
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`id`](#parameter-virtualnetworkgatewaypolicygroupsid) | string | Resource ID of the Virtual Network Gateway Policy Group. |
+
+### Parameter: `virtualNetworkGatewayPolicyGroups.id`
+
+Resource ID of the Virtual Network Gateway Policy Group.
+
+- Required: No
+- Type: string
+
+### Parameter: `vNetExtendedLocationResourceId`
+
+Extended Location Resource ID for VNET.
+
+- Required: No
+- Type: string
+- Default: `''`
+
+### Parameter: `vngClientConnectionConfigurations`
+
+Configurations for VPN client connection settings.
+
+- Required: No
+- Type: array
+- Default: `[]`
+
 ### Parameter: `vpnClientAadConfiguration`
 
 Configuration for AAD Authentication for P2S Tunnel Type, Cannot be configured if clientRootCertData is provided.
@@ -3142,6 +3369,165 @@ The IP address range from which VPN clients will receive an IP address when conn
 - Required: No
 - Type: string
 - Default: `''`
+
+### Parameter: `vpnClientIpsecPolicies`
+
+VPN client IPsec policies for virtual network gateway P2S client.
+
+- Required: No
+- Type: array
+
+**Required parameters**
+
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`dhGroup`](#parameter-vpnclientipsecpoliciesdhgroup) | string | The DH Group used in IKE Phase 1 for initial SA. |
+| [`ikeEncryption`](#parameter-vpnclientipsecpoliciesikeencryption) | string | The IKE encryption algorithm (IKE phase 2). |
+| [`ikeIntegrity`](#parameter-vpnclientipsecpoliciesikeintegrity) | string | The IKE integrity algorithm (IKE phase 2). |
+| [`ipsecEncryption`](#parameter-vpnclientipsecpoliciesipsecencryption) | string | The IPSec encryption algorithm (IKE phase 1). |
+| [`ipsecIntegrity`](#parameter-vpnclientipsecpoliciesipsecintegrity) | string | The IPSec integrity algorithm (IKE phase 1). |
+| [`pfsGroup`](#parameter-vpnclientipsecpoliciespfsgroup) | string | The Pfs Group used in IKE Phase 2 for new child SA. |
+| [`saDataSizeKilobytes`](#parameter-vpnclientipsecpoliciessadatasizekilobytes) | int | The IPSec Security Association (also called Quick Mode or Phase 2 SA) payload size in KB for a site to site VPN tunnel. |
+| [`saLifeTimeSeconds`](#parameter-vpnclientipsecpoliciessalifetimeseconds) | int | The IPSec Security Association (also called Quick Mode or Phase 2 SA) lifetime in seconds for a site to site VPN tunnel. |
+
+### Parameter: `vpnClientIpsecPolicies.dhGroup`
+
+The DH Group used in IKE Phase 1 for initial SA.
+
+- Required: No
+- Type: string
+- Allowed:
+  ```Bicep
+  [
+    'DHGroup1'
+    'DHGroup14'
+    'DHGroup2'
+    'DHGroup2048'
+    'DHGroup24'
+    'ECP256'
+    'ECP384'
+    'None'
+  ]
+  ```
+
+### Parameter: `vpnClientIpsecPolicies.ikeEncryption`
+
+The IKE encryption algorithm (IKE phase 2).
+
+- Required: No
+- Type: string
+- Allowed:
+  ```Bicep
+  [
+    'AES128'
+    'AES192'
+    'AES256'
+    'DES'
+    'DES3'
+    'GCMAES128'
+    'GCMAES256'
+  ]
+  ```
+
+### Parameter: `vpnClientIpsecPolicies.ikeIntegrity`
+
+The IKE integrity algorithm (IKE phase 2).
+
+- Required: No
+- Type: string
+- Allowed:
+  ```Bicep
+  [
+    'GCMAES128'
+    'GCMAES256'
+    'MD5'
+    'SHA1'
+    'SHA256'
+    'SHA384'
+  ]
+  ```
+
+### Parameter: `vpnClientIpsecPolicies.ipsecEncryption`
+
+The IPSec encryption algorithm (IKE phase 1).
+
+- Required: No
+- Type: string
+- Allowed:
+  ```Bicep
+  [
+    'AES128'
+    'AES192'
+    'AES256'
+    'DES'
+    'DES3'
+    'GCMAES128'
+    'GCMAES192'
+    'GCMAES256'
+    'None'
+  ]
+  ```
+
+### Parameter: `vpnClientIpsecPolicies.ipsecIntegrity`
+
+The IPSec integrity algorithm (IKE phase 1).
+
+- Required: No
+- Type: string
+- Allowed:
+  ```Bicep
+  [
+    'GCMAES128'
+    'GCMAES192'
+    'GCMAES256'
+    'MD5'
+    'SHA1'
+    'SHA256'
+  ]
+  ```
+
+### Parameter: `vpnClientIpsecPolicies.pfsGroup`
+
+The Pfs Group used in IKE Phase 2 for new child SA.
+
+- Required: No
+- Type: string
+- Allowed:
+  ```Bicep
+  [
+    'ECP256'
+    'ECP384'
+    'None'
+    'PFS1'
+    'PFS14'
+    'PFS2'
+    'PFS2048'
+    'PFS24'
+    'PFSMM'
+  ]
+  ```
+
+### Parameter: `vpnClientIpsecPolicies.saDataSizeKilobytes`
+
+The IPSec Security Association (also called Quick Mode or Phase 2 SA) payload size in KB for a site to site VPN tunnel.
+
+- Required: Yes
+- Type: int
+
+### Parameter: `vpnClientIpsecPolicies.saLifeTimeSeconds`
+
+The IPSec Security Association (also called Quick Mode or Phase 2 SA) lifetime in seconds for a site to site VPN tunnel.
+
+- Required: Yes
+- Type: int
+
+### Parameter: `vpnClientRootCertificates`
+
+Configuration for VPN Client Root Certificates.
+
+- Required: No
+- Type: array
+- Default: `[]`
 
 ### Parameter: `vpnGatewayGeneration`
 

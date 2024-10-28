@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.30.23.60470",
-      "templateHash": "1499507825797406827"
+      "templateHash": "13068729220194729011"
     },
     "name": "Virtual Network Gateways",
     "description": "This module deploys a Virtual Network Gateway.",
@@ -370,6 +370,212 @@
           }
         }
       }
+    },
+    "radiusServerType": {
+      "type": "object",
+      "properties": {
+        "radiusServerAddress": {
+          "type": "string",
+          "metadata": {
+            "description": "Required. The address of the Radius server."
+          }
+        },
+        "radiusServerScore": {
+          "type": "int",
+          "metadata": {
+            "description": "Required. The initial score assigned to the Radius server."
+          }
+        },
+        "radiusServerSecret": {
+          "type": "string",
+          "metadata": {
+            "description": "Required. The secret used for the Radius server."
+          }
+        }
+      }
+    },
+    "ipsecPolicyType": {
+      "type": "object",
+      "properties": {
+        "dhGroup": {
+          "type": "string",
+          "allowedValues": [
+            "DHGroup1",
+            "DHGroup14",
+            "DHGroup2",
+            "DHGroup2048",
+            "DHGroup24",
+            "ECP256",
+            "ECP384",
+            "None"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Required. The DH Group used in IKE Phase 1 for initial SA."
+          }
+        },
+        "ikeEncryption": {
+          "type": "string",
+          "allowedValues": [
+            "AES128",
+            "AES192",
+            "AES256",
+            "DES",
+            "DES3",
+            "GCMAES128",
+            "GCMAES256"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Required. The IKE encryption algorithm (IKE phase 2)."
+          }
+        },
+        "ikeIntegrity": {
+          "type": "string",
+          "allowedValues": [
+            "GCMAES128",
+            "GCMAES256",
+            "MD5",
+            "SHA1",
+            "SHA256",
+            "SHA384"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Required. The IKE integrity algorithm (IKE phase 2)."
+          }
+        },
+        "ipsecEncryption": {
+          "type": "string",
+          "allowedValues": [
+            "AES128",
+            "AES192",
+            "AES256",
+            "DES",
+            "DES3",
+            "GCMAES128",
+            "GCMAES192",
+            "GCMAES256",
+            "None"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Required. The IPSec encryption algorithm (IKE phase 1)."
+          }
+        },
+        "ipsecIntegrity": {
+          "type": "string",
+          "allowedValues": [
+            "GCMAES128",
+            "GCMAES192",
+            "GCMAES256",
+            "MD5",
+            "SHA1",
+            "SHA256"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Required. The IPSec integrity algorithm (IKE phase 1)."
+          }
+        },
+        "pfsGroup": {
+          "type": "string",
+          "allowedValues": [
+            "ECP256",
+            "ECP384",
+            "None",
+            "PFS1",
+            "PFS14",
+            "PFS2",
+            "PFS2048",
+            "PFS24",
+            "PFSMM"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Required. The Pfs Group used in IKE Phase 2 for new child SA."
+          }
+        },
+        "saDataSizeKilobytes": {
+          "type": "int",
+          "metadata": {
+            "description": "Required. The IPSec Security Association (also called Quick Mode or Phase 2 SA) payload size in KB for a site to site VPN tunnel."
+          }
+        },
+        "saLifeTimeSeconds": {
+          "type": "int",
+          "metadata": {
+            "description": "Required. The IPSec Security Association (also called Quick Mode or Phase 2 SA) lifetime in seconds for a site to site VPN tunnel."
+          }
+        }
+      }
+    },
+    "virtualNetworkGatewayPolicyGroupType": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Resource ID of the Virtual Network Gateway Policy Group."
+          }
+        },
+        "name": {
+          "type": "string",
+          "nullable": true
+        },
+        "properties": {
+          "type": "object",
+          "properties": {
+            "isDefault": {
+              "type": "bool",
+              "nullable": true,
+              "metadata": {
+                "description": "Optional. Priority of the Virtual Network Gateway Policy Group."
+              }
+            },
+            "policyMembers": {
+              "type": "array",
+              "prefixItems": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "attributeType": {
+                      "type": "string",
+                      "allowedValues": [
+                        "AADGroupId",
+                        "CertificateGroupId",
+                        "RadiusAzureGroupId"
+                      ],
+                      "metadata": {
+                        "description": "Required. The attribute type of the policy member."
+                      }
+                    },
+                    "attributeValue": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "Required. The attribute value of the policy member."
+                      }
+                    },
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "Required. The name of the policy member."
+                      }
+                    }
+                  }
+                }
+              ],
+              "items": false,
+              "nullable": true
+            },
+            "priority": {
+              "type": "int",
+              "nullable": true
+            }
+          }
+        }
+      }
     }
   },
   "parameters": {
@@ -617,6 +823,110 @@
       "metadata": {
         "description": "Optional. Configuration for AAD Authentication for P2S Tunnel Type, Cannot be configured if clientRootCertData is provided."
       }
+    },
+    "adminState": {
+      "type": "string",
+      "defaultValue": "Enabled",
+      "allowedValues": [
+        "Enabled",
+        "Disabled"
+      ],
+      "metadata": {
+        "description": "Optional. Specifies administrative state of the Virtual Network Gateway."
+      }
+    },
+    "radiusServers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/radiusServerType"
+      },
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. The Radius server configuration for VPN clients."
+      }
+    },
+    "radiusServerAddress": {
+      "type": "string",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. The radius server address property of the VirtualNetworkGateway resource for vpn client connection."
+      }
+    },
+    "radiusServerSecret": {
+      "type": "securestring",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. The radius secret property of the VirtualNetworkGateway resource for vpn client connection."
+      }
+    },
+    "vpnClientIpsecPolicies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ipsecPolicyType"
+      },
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. VPN client IPsec policies for virtual network gateway P2S client."
+      }
+    },
+    "vpnClientRootCertificates": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Optional. Configuration for VPN Client Root Certificates."
+      }
+    },
+    "customRoutes": {
+      "type": "object",
+      "defaultValue": {
+        "addressPrefixes": []
+      },
+      "metadata": {
+        "description": "Optional. The custom routes for the Virtual Network Gateway."
+      }
+    },
+    "autoScaleConfiguration": {
+      "type": "object",
+      "defaultValue": {
+        "bounds": {
+          "min": 1,
+          "max": 10
+        }
+      },
+      "metadata": {
+        "description": "Optional. The configuration for Auto-Scaling. Minimum and Maximum bounds."
+      }
+    },
+    "virtualNetworkGatewayPolicyGroups": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/virtualNetworkGatewayPolicyGroupType"
+      },
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. Virtual Network Gateway Policy Groups."
+      }
+    },
+    "vNetExtendedLocationResourceId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Extended Location Resource ID for VNET."
+      }
+    },
+    "extendedLocation": {
+      "type": "object",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. Specifies the extended location for this resource."
+      }
+    },
+    "vngClientConnectionConfigurations": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Optional. Configurations for VPN client connection settings."
+      }
     }
   },
   "variables": {
@@ -637,7 +947,7 @@
     "arrayPipNameVar": "[if(variables('isActiveActive'), concat(if(not(empty(parameters('existingFirstPipResourceId'))), createArray(), createArray(parameters('firstPipName'))), if(not(empty(variables('existingSecondPipResourceIdVar'))), createArray(), createArray(variables('secondPipNameVar')))), concat(if(not(empty(parameters('existingFirstPipResourceId'))), createArray(), createArray(parameters('firstPipName')))))]",
     "bgpSettingsVar": "[if(variables('isActiveActive'), createObject('asn', coalesce(tryGet(parameters('clusterSettings'), 'asn'), 65515), 'bgpPeeringAddresses', createArray(createObject('customBgpIpAddresses', tryGet(parameters('clusterSettings'), 'customBgpIpAddresses'), 'ipconfigurationId', format('{0}/ipConfigurations/vNetGatewayConfig1', resourceId('Microsoft.Network/virtualNetworkGateways', parameters('name')))), createObject('customBgpIpAddresses', tryGet(parameters('clusterSettings'), 'secondCustomBgpIpAddresses'), 'ipconfigurationId', format('{0}/ipConfigurations/vNetGatewayConfig2', resourceId('Microsoft.Network/virtualNetworkGateways', parameters('name')))))), createObject('asn', coalesce(tryGet(parameters('clusterSettings'), 'asn'), 65515), 'bgpPeeringAddresses', createArray(createObject('customBgpIpAddresses', tryGet(parameters('clusterSettings'), 'customBgpIpAddresses'), 'ipconfigurationId', format('{0}/ipConfigurations/vNetGatewayConfig1', resourceId('Microsoft.Network/virtualNetworkGateways', parameters('name')))))))]",
     "ipConfiguration": "[if(variables('isActiveActive'), createArray(createObject('properties', createObject('privateIPAllocationMethod', 'Dynamic', 'subnet', createObject('id', format('{0}/subnets/GatewaySubnet', parameters('vNetResourceId'))), 'publicIPAddress', createObject('id', if(not(empty(parameters('existingFirstPipResourceId'))), parameters('existingFirstPipResourceId'), resourceId('Microsoft.Network/publicIPAddresses', parameters('firstPipName'))))), 'name', 'vNetGatewayConfig1'), createObject('properties', createObject('privateIPAllocationMethod', 'Dynamic', 'subnet', createObject('id', format('{0}/subnets/GatewaySubnet', parameters('vNetResourceId'))), 'publicIPAddress', createObject('id', if(variables('isActiveActive'), if(not(empty(variables('existingSecondPipResourceIdVar'))), variables('existingSecondPipResourceIdVar'), resourceId('Microsoft.Network/publicIPAddresses', variables('secondPipNameVar'))), if(not(empty(parameters('existingFirstPipResourceId'))), parameters('existingFirstPipResourceId'), resourceId('Microsoft.Network/publicIPAddresses', parameters('firstPipName')))))), 'name', 'vNetGatewayConfig2')), createArray(createObject('properties', createObject('privateIPAllocationMethod', 'Dynamic', 'subnet', createObject('id', format('{0}/subnets/GatewaySubnet', parameters('vNetResourceId'))), 'publicIPAddress', createObject('id', if(not(empty(parameters('existingFirstPipResourceId'))), parameters('existingFirstPipResourceId'), resourceId('Microsoft.Network/publicIPAddresses', parameters('firstPipName'))))), 'name', 'vNetGatewayConfig1')))]",
-    "vpnClientConfiguration": "[if(not(empty(parameters('clientRootCertData'))), createObject('vpnClientAddressPool', createObject('addressPrefixes', createArray(parameters('vpnClientAddressPoolPrefix'))), 'vpnClientRootCertificates', createArray(createObject('name', 'RootCert1', 'properties', createObject('publicCertData', parameters('clientRootCertData')))), 'vpnClientRevokedCertificates', if(not(empty(parameters('clientRevokedCertThumbprint'))), createArray(createObject('name', 'RevokedCert1', 'properties', createObject('thumbprint', parameters('clientRevokedCertThumbprint')))), null())), if(not(empty(parameters('vpnClientAadConfiguration'))), createObject('vpnClientAddressPool', createObject('addressPrefixes', createArray(parameters('vpnClientAddressPoolPrefix'))), 'aadTenant', parameters('vpnClientAadConfiguration').aadTenant, 'aadAudience', parameters('vpnClientAadConfiguration').aadAudience, 'aadIssuer', parameters('vpnClientAadConfiguration').aadIssuer, 'vpnAuthenticationTypes', parameters('vpnClientAadConfiguration').vpnAuthenticationTypes, 'vpnClientProtocols', parameters('vpnClientAadConfiguration').vpnClientProtocols), null()))]",
+    "vpnClientConfiguration": "[if(not(empty(parameters('clientRootCertData'))), createObject('vpnClientAddressPool', createObject('addressPrefixes', createArray(parameters('vpnClientAddressPoolPrefix'))), 'vpnClientRootCertificates', createArray(createObject('name', 'RootCert1', 'properties', createObject('publicCertData', parameters('clientRootCertData')))), 'vpnClientRevokedCertificates', if(not(empty(parameters('clientRevokedCertThumbprint'))), createArray(createObject('name', 'RevokedCert1', 'properties', createObject('thumbprint', parameters('clientRevokedCertThumbprint')))), null())), if(not(empty(parameters('radiusServers'))), createObject('radiusServerAddress', parameters('radiusServerAddress'), 'radiusServers', parameters('radiusServers'), 'radiusServerSecret', parameters('radiusServerSecret'), 'vpnClientIpsecPolicies', parameters('vpnClientIpsecPolicies'), 'vpnClientRootCertificates', parameters('vpnClientRootCertificates')), if(not(empty(parameters('vpnClientAadConfiguration'))), createObject('vpnClientAddressPool', createObject('addressPrefixes', createArray(parameters('vpnClientAddressPoolPrefix'))), 'aadTenant', parameters('vpnClientAadConfiguration').aadTenant, 'aadAudience', parameters('vpnClientAadConfiguration').aadAudience, 'aadIssuer', parameters('vpnClientAadConfiguration').aadIssuer, 'vpnAuthenticationTypes', parameters('vpnClientAadConfiguration').vpnAuthenticationTypes, 'vpnClientProtocols', parameters('vpnClientAadConfiguration').vpnClientProtocols), if(not(empty(parameters('vngClientConnectionConfigurations'))), createObject('vngClientConnectionConfigurations', parameters('vngClientConnectionConfigurations')), null()))))]",
     "builtInRoleNames": {
       "Contributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
       "Network Contributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4d97b98b-1d4f-4787-a291-c67834d212e7')]",
@@ -670,10 +980,11 @@
     },
     "virtualNetworkGateway": {
       "type": "Microsoft.Network/virtualNetworkGateways",
-      "apiVersion": "2023-04-01",
+      "apiVersion": "2024-03-01",
       "name": "[parameters('name')]",
       "location": "[parameters('location')]",
       "tags": "[parameters('tags')]",
+      "extendedLocation": "[parameters('extendedLocation')]",
       "properties": {
         "ipConfigurations": "[variables('ipConfiguration')]",
         "activeActive": "[variables('isActiveActive')]",
@@ -693,7 +1004,12 @@
         },
         "vpnType": "[variables('vpnTypeVar')]",
         "vpnClientConfiguration": "[if(not(empty(parameters('vpnClientAddressPoolPrefix'))), variables('vpnClientConfiguration'), null())]",
-        "vpnGatewayGeneration": "[if(equals(parameters('gatewayType'), 'Vpn'), parameters('vpnGatewayGeneration'), 'None')]"
+        "vpnGatewayGeneration": "[if(equals(parameters('gatewayType'), 'Vpn'), parameters('vpnGatewayGeneration'), 'None')]",
+        "adminState": "[parameters('adminState')]",
+        "customRoutes": "[parameters('customRoutes')]",
+        "autoScaleConfiguration": "[parameters('autoScaleConfiguration')]",
+        "virtualNetworkGatewayPolicyGroups": "[parameters('virtualNetworkGatewayPolicyGroups')]",
+        "vNetExtendedLocationResourceId": "[parameters('vNetExtendedLocationResourceId')]"
       },
       "dependsOn": [
         "publicIPAddress"
@@ -1626,7 +1942,7 @@
       "metadata": {
         "description": "The location the resource was deployed into."
       },
-      "value": "[reference('virtualNetworkGateway', '2023-04-01', 'full').location]"
+      "value": "[reference('virtualNetworkGateway', '2024-03-01', 'full').location]"
     }
   }
 }

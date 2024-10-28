@@ -171,10 +171,7 @@ param virtualNetworkGatewayPolicyGroups virtualNetworkGatewayPolicyGroupType []?
 param vNetExtendedLocationResourceId string = ''
 
 @description('Optional. Specifies the extended location for this resource.')
-param extendedLocation object = {
-  name: ''
-  type: ''
-}
+param extendedLocation object?
 
 @description('Optional. Configurations for VPN client connection settings.')
 param vngClientConnectionConfigurations array = []
@@ -431,7 +428,7 @@ resource virtualNetworkGateway 'Microsoft.Network/virtualNetworkGateways@2024-03
   name: name
   location: location
   tags: tags
-  //extendedLocation: extendedLocation
+  extendedLocation: extendedLocation
   properties: {
     ipConfigurations: ipConfiguration
     activeActive: isActiveActive
@@ -727,9 +724,21 @@ type ipsecPolicyType = {
 
 type virtualNetworkGatewayPolicyGroupType = {
   @description ('Optional. Resource ID of the Virtual Network Gateway Policy Group.')
-  id: string
+  id: string?
+  name: string?
   properties: {
   @description ('Optional. Priority of the Virtual Network Gateway Policy Group.')
-    priority: int 
+    isDefault: bool?
+    policyMembers: [
+      {
+        @description ('Required. The attribute type of the policy member.')
+        attributeType: ('AADGroupId' | 'CertificateGroupId' | 'RadiusAzureGroupId')
+        @description ('Required. The attribute value of the policy member.')
+        attributeValue: string
+        @description ('Required. The name of the policy member.')
+        name: string
+      }
+    ]?
+    priority: int?
   }
 }

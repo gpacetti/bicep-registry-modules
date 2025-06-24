@@ -1,4 +1,4 @@
-metadata name = 'User Assigned Identities'
+// metadata name = 'User Assigned Identities'
 metadata description = 'This module deploys a User Assigned Identity.'
 
 @description('Required. Name of the User Assigned Identity.')
@@ -76,7 +76,7 @@ resource avmTelemetry 'Microsoft.Resources/deployments@2024-03-01' = if (enableT
   }
 }
 
-resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' = {
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2025-01-31-preview' = {
   name: name
   location: location
   tags: tags

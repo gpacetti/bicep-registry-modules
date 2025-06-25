@@ -59,6 +59,14 @@ module testDeployment '../../../main.bicep' = [
           ]
           issuer: 'https://contoso.com/${subscription().tenantId}/${guid(deployment().name)}01/'
           subject: 'system:serviceaccount:default:workload-identity-sa'
+          // Only issue a token if iss, sub and aud exactly match
+          claimsMatchingExpression: {
+            languageVersion: 1
+            value: '''iss == 'https://contoso.com/${subscription().tenantId}/${guid(deployment().name)}01/'
+                  && sub == 'system:serviceaccount:default:workload-identity-sa'
+                  && aud == 'api://AzureADTokenExchange'
+                  '''
+          }
         }
         {
           name: 'test-fed-cred-${serviceShort}-002'
@@ -67,6 +75,14 @@ module testDeployment '../../../main.bicep' = [
           ]
           issuer: 'https://contoso.com/${subscription().tenantId}/${guid(deployment().name)}02/'
           subject: 'system:serviceaccount:default:workload-identity-sa'
+          // Only issue a token if iss, sub and aud exactly match
+          claimsMatchingExpression: {
+            languageVersion: 1
+            value: '''iss == 'https://contoso.com/${subscription().tenantId}/${guid(deployment().name)}02/'
+                  && sub == 'system:serviceaccount:default:workload-identity-sa'
+                  && aud == 'api://AzureADTokenExchange'
+                  '''
+          }
         }
       ]
       tags: {

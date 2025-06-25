@@ -17,6 +17,7 @@ param issuer string
 param subject string
 
 @description('Required. An object describing your claims filter. ‘languageVersion’ (int) is the expression grammar version; ‘value’ (string) is the logical expression against token claims.')
+//THIS IS A PARAMETER/ USED FOR A PREVIEW FEATURE, MICROSOFT MAY NOT PROVIDE SUPPORT FOR THIS, PLEASE CHECK THE PRODUCT DOCS FOR CLARIFICATION”
 param claimsMatchingExpression object
 
 resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2025-01-31-preview' existing = {

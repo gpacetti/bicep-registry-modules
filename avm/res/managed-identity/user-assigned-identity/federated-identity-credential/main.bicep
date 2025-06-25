@@ -19,7 +19,7 @@ param subject string
 @description('Required. An object describing your claims filter. ‘languageVersion’ (int) is the expression grammar version; ‘value’ (string) is the logical expression against token claims.')
 param claimsMatchingExpression object
 
-resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = {
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2025-01-31-preview' existing = {
   name: userAssignedIdentityName
 }
 

@@ -103,6 +103,10 @@ module userAssignedIdentity_federatedIdentityCredentials 'federated-identity-cre
       audiences: federatedIdentityCredential.audiences
       issuer: federatedIdentityCredential.issuer
       subject: federatedIdentityCredential.subject
+      claimsMatchingExpression: {
+        languageVersion: federatedIdentityCredential.claimsMatchingExpression.languageVersion
+        value: federatedIdentityCredential.claimsMatchingExpression.value
+      }
     }
   }
 ]
@@ -163,4 +167,12 @@ type federatedIdentityCredentialType = {
 
   @description('Required. The identifier of the external identity.')
   subject: string
+
+  @description('Required. An object describing your claims filter.')
+  claimsMatchingExpression: {
+    @description('Required. The expression grammar version.')
+    languageVersion: int
+    @description('Required. The logical expression against token claims.')
+    value: string
+  }
 }

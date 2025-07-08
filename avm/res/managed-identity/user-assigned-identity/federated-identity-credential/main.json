@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.34.44.8038",
-      "templateHash": "13656021764446440473"
+      "version": "0.35.1.17967",
+      "templateHash": "11149855498947128622"
     },
     "name": "User Assigned Identity Federated Identity Credential",
     "description": "This module deploys a User Assigned Identity Federated Identity Credential."
@@ -40,17 +40,27 @@
       "metadata": {
         "description": "Required. The identifier of the external software workload within the external identity provider. Like the audience value, it has no fixed format, as each IdP uses their own - sometimes a GUID, sometimes a colon delimited identifier, sometimes arbitrary strings. The value here must match the sub claim within the token presented to Azure AD."
       }
+    },
+    "claimsMatchingExpression": {
+      "type": "object",
+      "metadata": {
+        "description": "Required. An object describing your claims filter. ‘languageVersion’ (int) is the expression grammar version; ‘value’ (string) is the logical expression against token claims."
+      }
     }
   },
   "resources": [
     {
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials",
-      "apiVersion": "2024-11-30",
+      "apiVersion": "2025-01-31-preview",
       "name": "[format('{0}/{1}', parameters('userAssignedIdentityName'), parameters('name'))]",
       "properties": {
         "audiences": "[parameters('audiences')]",
         "issuer": "[parameters('issuer')]",
-        "subject": "[parameters('subject')]"
+        "subject": "[parameters('subject')]",
+        "claimsMatchingExpression": {
+          "languageVersion": "[parameters('claimsMatchingExpression').languageVersion]",
+          "value": "[parameters('claimsMatchingExpression').value]"
+        }
       }
     }
   ],

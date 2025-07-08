@@ -12,7 +12,7 @@ This module deploys a User Assigned Identity Federated Identity Credential.
 
 | Resource Type | API Version |
 | :-- | :-- |
-| `Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials` | [2024-11-30](https://learn.microsoft.com/en-us/azure/templates/Microsoft.ManagedIdentity/2024-11-30/userAssignedIdentities/federatedIdentityCredentials) |
+| `Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials` | [2025-01-31-preview](https://learn.microsoft.com/en-us/azure/templates/Microsoft.ManagedIdentity/2025-01-31-preview/userAssignedIdentities/federatedIdentityCredentials) |
 
 ## Parameters
 
@@ -21,6 +21,7 @@ This module deploys a User Assigned Identity Federated Identity Credential.
 | Parameter | Type | Description |
 | :-- | :-- | :-- |
 | [`audiences`](#parameter-audiences) | array | The list of audiences that can appear in the issued token. Should be set to api://AzureADTokenExchange for Azure AD. It says what Microsoft identity platform should accept in the aud claim in the incoming token. This value represents Azure AD in your external identity provider and has no fixed value across identity providers - you might need to create a new application registration in your IdP to serve as the audience of this token. |
+| [`claimsMatchingExpression`](#parameter-claimsmatchingexpression) | object | An object describing your claims filter. ΓÇÿlanguageVersionΓÇÖ (int) is the expression grammar version; ΓÇÿvalueΓÇÖ (string) is the logical expression against token claims. |
 | [`issuer`](#parameter-issuer) | string | The URL of the issuer to be trusted. Must match the issuer claim of the external token being exchanged. |
 | [`name`](#parameter-name) | string | The name of the secret. |
 | [`subject`](#parameter-subject) | string | The identifier of the external software workload within the external identity provider. Like the audience value, it has no fixed format, as each IdP uses their own - sometimes a GUID, sometimes a colon delimited identifier, sometimes arbitrary strings. The value here must match the sub claim within the token presented to Azure AD. |
@@ -37,6 +38,13 @@ The list of audiences that can appear in the issued token. Should be set to api:
 
 - Required: Yes
 - Type: array
+
+### Parameter: `claimsMatchingExpression`
+
+An object describing your claims filter. ΓÇÿlanguageVersionΓÇÖ (int) is the expression grammar version; ΓÇÿvalueΓÇÖ (string) is the logical expression against token claims.
+
+- Required: Yes
+- Type: object
 
 ### Parameter: `issuer`
 

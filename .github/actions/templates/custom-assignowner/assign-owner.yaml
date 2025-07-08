@@ -1,0 +1,25 @@
+name: Assign Azure Owner Role
+
+on:
+  workflow_dispatch:
+
+jobs:
+  assign-owner:
+    runs-on: ubuntu-latest
+    steps:
+
+      # 1. Authenticate to Azure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id:     ${{ secrets.VALIDATE_CLIENT_ID }}
+          tenant-id:     ${{ secrets.VALIDATE_TENANT_ID }}
+          subscription-id: ${{ secrets.VALIDATE_SUBSCRIPTION_ID }}
+
+      # 2. Assign Owner role at subscription level
+      - name: Assign Owner role
+        run: |
+          az role assignment create \
+            --assignee "${{ secrets.VALIDATE_PRINCIPAL_ID }}" \
+            --role Owner \
+            --scope "/subscriptions/${{ secrets.VALIDATE_SUBSCRIPTION_ID }}"

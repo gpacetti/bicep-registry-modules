@@ -1,4 +1,4 @@
-name: Assign Azure Owner Role
+name: ".Platform - Assign owner"
 
 on:
   workflow_dispatch:
